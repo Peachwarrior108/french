@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>French conjugation quiz</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:wght@500;700&display=swap">
+<style>
+:root{--bg:#eef2f6;--panel:#fff;--ink:#14213d;--mute:#5b6b85;--line:#cbd5e3;--acc:#2b59c3;--ok:#1e7b4f;--okbg:#dff3e7;--bad:#b3261e;--badbg:#fbe3e1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1624;--panel:#19233a;--ink:#e8edf7;--mute:#9aa8c2;--line:#33425f;--acc:#7da2ff;--ok:#6fd49b;--okbg:#17372a;--bad:#ff8b82;--badbg:#412220}}
+:root[data-theme="dark"]{--bg:#0f1624;--panel:#19233a;--ink:#e8edf7;--mute:#9aa8c2;--line:#33425f;--acc:#7da2ff;--ok:#6fd49b;--okbg:#17372a;--bad:#ff8b82;--badbg:#412220}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 2rem/1.1 "Newsreader",Georgia,serif;margin:8px 0 4px}
+p.sub{margin:0 0 16px;color:var(--mute)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+button{font:inherit;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:8px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--acc);outline-offset:1px}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button.go{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+label.tg{display:flex;gap:6px;align-items:center;color:var(--mute);font-size:.9rem;margin-left:auto}
+#score{font:700 1.2rem "Newsreader",Georgia,serif;min-height:1.6em;margin:0 0 10px}
+.wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{border:1px solid var(--line);padding:6px;text-align:center;vertical-align:top}
+thead th{font:700 1.05rem "Newsreader",Georgia,serif}
+thead th small{display:block;font:400 .78rem system-ui,sans-serif;color:var(--mute)}
+tbody th{text-align:left;font-weight:600;font-size:.88rem;white-space:nowrap;color:var(--mute);background:var(--bg)}
+td input{width:100%;min-width:5.6rem;font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);text-align:center}
+td.ok input{background:var(--okbg);border-color:var(--ok);color:var(--ok);font-weight:600}
+td.bad input{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+td .ans{display:block;font-size:.8rem;font-weight:600;color:var(--ok);margin-top:2px}
+td.na{background:var(--bg);color:var(--mute)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Conjugation quiz</h1>
+<p class="sub">Type every form from memory, then check. Enter jumps to the next box.</p>
+<div class="bar">
+<button id="t1" class="on">Chart 1: avoir to sortir</button>
+<button id="t2">Chart 2: vouloir to prendre</button>
+<label class="tg"><input type="checkbox" id="acc" checked> Accept missing accents</label>
+</div>
+<div class="bar">
+<button class="go" id="check">Check answers</button>
+<button id="clear">Clear</button>
+</div>
+<p id="score" aria-live="polite"></p>
+<div id="c1" class="wrap"></div>
+<div id="c2" class="wrap hide"></div>
+</main>
+<script>
+const ROWS=["Je","Tu","Il / Elle / On","Nous","Vous","Ils / Elles","Impératif (tu)","Participe passé"];
+// per verb: [je, tu, il, nous, vous, ils, imperatif, participe]; arrays = accepted variants
+const D={
+1:[
+["avoir","to have",[["j'ai","ai"],"as","a","avons","avez","ont","aie","eu"]],
+["être","to be",["suis","es","est","sommes","êtes","sont","sois","été"]],
+["aller","to go",["vais","vas","va","allons","allez","vont","va","allé"]],
+["faire","to make",["fais","fais","fait","faisons","faites","font","fais","fait"]],
+["partir","to leave",["pars","pars","part","partons","partez","partent","pars","parti"]],
+["sortir","to go out",["sors","sors","sort","sortons","sortez","sortent","sors","sorti"]]],
+2:[
+["vouloir","to want",["veux","veux","veut","voulons","voulez","veulent",null,"voulu"]],
+["pouvoir","to be able to",["peux","peux","peut","pouvons","pouvez","peuvent",null,"pu"]],
+["devoir","to have to",["dois","dois","doit","devons","devez","doivent",null,"dû"]],
+["savoir","to know",["sais","sais","sait","savons","savez","savent","sache","su"]],
+["boire","to drink",["bois","bois","boit","buvons","buvez","boivent","bois","bu"]],
+["prendre","to take",["prends","prends","prend","prenons","prenez","prennent","prends","pris"]]]
+};
+const norm=(s,strip)=>{s=s.toLowerCase().trim().replace(/[’‘`]/g,"'").replace(/\s+/g,"");return strip?s.normalize("NFD").replace(/[\u0300-\u036f]/g,""):s};
+const $=id=>document.getElementById(id);
+let cur=1;
+function build(n){
+  const v=D[n];
+  let h="<table><thead><tr><th></th>"+v.map(x=>`<th>${x[0]}<small>${x[1]}</small></th>`).join("")+"</tr></thead><tbody>";
+  ROWS.forEach((r,i)=>{
+    h+=`<tr><th scope="row">${r}</th>`;
+    v.forEach((x,j)=>{
+      const a=x[2][i];
+      h+=a===null?`<td class="na">—</td>`:`<td><input data-c="${n}" data-r="${i}" data-v="${j}" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="${x[0]}, ${r}"></td>`;
+    });
+    h+="</tr>";
+  });
+  $("c"+n).innerHTML=h+"</tbody></table>";
+  const ins=[...$("c"+n).querySelectorAll("input")].sort((a,b)=>a.dataset.v-b.dataset.v||a.dataset.r-b.dataset.r);
+  ins.forEach((el,k)=>el.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();(ins[k+1]||$("check")).focus()}}));
+}
+function check(){
+  const strip=$("acc").checked;let ok=0,tot=0,empty=0;
+  document.querySelectorAll(`#c${cur} input`).forEach(el=>{
+    const td=el.parentElement;td.classList.remove("ok","bad");const o=td.querySelector(".ans");if(o)o.remove();
+    const a=D[cur][el.dataset.v][2][el.dataset.r];const list=(Array.isArray(a)?a:[a]);
+    const good=list.some(x=>norm(x,strip)===norm(el.value,strip));
+    tot++;
+    if(good){ok++;td.classList.add("ok")}
+    else{td.classList.add("bad");const s=document.createElement("span");s.className="ans";s.textContent=list[0];td.appendChild(s);if(!el.value.trim())empty++}
+  });
+  $("score").textContent=`${ok} / ${tot} correct`+(ok===tot?" — perfect.":empty?` (${empty} left blank)`:"");
+}
+function clearAll(){
+  document.querySelectorAll(`#c${cur} td`).forEach(td=>{td.classList.remove("ok","bad");const o=td.querySelector(".ans");if(o)o.remove();const i=td.querySelector("input");if(i)i.value=""});
+  $("score").textContent="";
+}
+function show(n){
+  cur=n;$("c1").classList.toggle("hide",n!==1);$("c2").classList.toggle("hide",n!==2);
+  $("t1").classList.toggle("on",n===1);$("t2").classList.toggle("on",n===2);$("score").textContent="";
+}
+build(1);build(2);
+$("t1").onclick=()=>show(1);$("t2").onclick=()=>show(2);
+$("check").onclick=check;$("clear").onclick=clearAll;
+</script>
+</body>
+</html>
